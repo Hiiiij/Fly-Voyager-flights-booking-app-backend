@@ -1,0 +1,54 @@
+
+import mongoose, { Schema, Document } from "mongoose";
+
+interface IBooking extends Document {
+  id: number;
+  user: string;
+  flight: string;
+  bookingDate: Date;
+  status: string;
+}
+
+const bookingSchema = new Schema({
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    required:true
+  },
+  flight: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Flight",
+    required:true
+  },
+  bookingDate: {
+    type: Date,
+    default: Date.now,
+    required:true
+  },
+  status: {
+    type: String,
+    enum: ["Pending", "Confirmed", "Cancelled"],
+    default: "Pending"
+  }
+});
+
+const Booking = mongoose.model<IBooking>('Booking', bookingSchema)
+
+
+export default Booking;
+
+
+
+// const BookingSchema = new mongoose.Schema({
+// 
+//
+//   ],
+//   price: Number,
+//   standard: String, 
+//   bookingStatus: {
+//     type: String,
+//     enum: ['pending', 'confirmed'],
+//   },
+//   createdAt: { type: Date, default: Date.now },
+// });
+
