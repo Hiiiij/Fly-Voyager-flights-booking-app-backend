@@ -1,5 +1,5 @@
 import express from "express";
-import router from "./routes.js";
+import router from "./bookingRoutes.js"
 import dotenv from 'dotenv';
 import mongoose from "mongoose";
 import {userSchema} from '../models/userModel.js';

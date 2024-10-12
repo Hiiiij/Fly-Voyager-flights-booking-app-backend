@@ -9,7 +9,7 @@ export interface IFlight extends Document {
 export const flightSchema = new Schema({
     origin: {
         type: String,
-        required: true
+        required: true,
     },
     destination: {
         type: String,
