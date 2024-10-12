@@ -54,7 +54,7 @@ const getFlights = async (req: Request, res: Response) => {
 
     catch (error)
     {
-        let message = "An error occurred while displaying the flight.";
+        let message = "An error with displaying the flight.";
         if (error instanceof Error)
         {
             message = error.message;
@@ -67,8 +67,4 @@ const getFlights = async (req: Request, res: Response) => {
     }
 }
 
-
-
-
-
-    export default { createFlight, getFlights };
+export default { createFlight, getFlights };

@@ -1,31 +1,35 @@
 import express from "express";
-import router from "./flightRoutes.js";
 import mongoose from "mongoose";
+import router from "./flightRoutes.js";
 import dotenv from "dotenv";
+
 dotenv.config();
 
+let isConnected = false;
 const app = express();
 
-// const PORT = 3002;
-//middleware handling json request
-// app.use(express.json());
-//connect to database for flights
+app.use(express.json()); // Middleware for parsing JSON bodies
 app.use("/api/flights", router);
-
-// MongoDB connection logic
 const connectDB = async () => {
+  if (isConnected) {
+    console.log("Using existing MongoDB connection");
+    return;
+  }
+
   const mongoUri = process.env.MONGODB_URI;
+
+  if (!mongoUri) {
+    throw new Error("MONGODB_URI is not defined in environment variables");
+  }
+
   try {
-    await mongoose.connect(mongoUri == null ? "" : mongoUri);
-    console.log("Connected to the DB");
-  } catch (e) {
-    console.error(e);
+    const db = await mongoose.connect(mongoUri);
+    isConnected = db.connections[0].readyState === 1;
+    console.log("Connected to MongoDB:", isConnected);
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    throw error;
   }
 };
-const PORT = process.env.USER_SERVICES_PATH || 3002;
-
-// app.listen(PORT, () => {
-//     console.log(`the user server is open at port: ${PORT}`)
-// })
 
 export { app, connectDB };
