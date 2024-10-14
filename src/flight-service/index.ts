@@ -7,9 +7,9 @@ dotenv.config();
 
 let isConnected = false;
 const app = express();
-
 app.use(express.json()); // Middleware for parsing JSON bodies
 app.use("/api/flights", router);
+
 const connectDB = async () => {
   if (isConnected) {
     console.log("Using existing MongoDB connection");

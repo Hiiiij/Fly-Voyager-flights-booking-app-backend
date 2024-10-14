@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "npx nf start"
+    "dev": "npx nf start",
+    "migrate:up": "ts-node --transpile-only ./node_modules/.bin/migrate-mongo up",
+    "migrate:down": "ts-node --transpile-only ./node_modules/.bin/migrate-mongo down"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +26,6 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^22.5.5",
-    "foreman": "^3.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
   }
