@@ -17,7 +17,7 @@ const getFlights = async (req: Request, res: Response) => {
       query._id = { $gt: cursor };
     }
 
-    // Fetch flights based on the cursor
+    // Fetch flights based on the cursor//logic for connecting real-time api
     const flights = await Flight.find(query)
       .sort({ _id: 1 }) // Ensure consistent ordering by _id
       .limit(limit);

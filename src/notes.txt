@@ -48,3 +48,12 @@ Event-Driven Architecture: Utilize an event-driven model where services communic
 Data Duplication: While it may seem counterintuitive, sometimes duplicating certain data across services can help avoid tight coupling. For example, if the booking service needs user information, it can maintain a local copy of relevant user data.
 
 Versioning: Implement versioning for APIs so that changes in one service can be made without breaking others.
+
+//Approach 1
+
+1. real-time //basic + skllis 
+
+2. use cron job  to get data from aviation api and save in flightModel db 
+to fetch data //logic  
+
+3. seed db with data manually use faker ==> 3models 

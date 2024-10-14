@@ -1,4 +1,3 @@
-
 import mongoose, { Schema, Document } from "mongoose";
 
 interface IBooking extends Document {
@@ -13,42 +12,26 @@ const bookingSchema = new Schema({
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
-    required:true
+    required: true,
   },
+  //relying on API
   flight: {
     type: mongoose.Schema.ObjectId,
     ref: "Flight",
-    required:true
+    required: true,
   },
   bookingDate: {
     type: Date,
     default: Date.now,
-    required:true
+    required: true,
   },
   status: {
     type: String,
     enum: ["Pending", "Confirmed", "Cancelled"],
-    default: "Pending"
-  }
+    default: "Pending",
+  },
 });
 
-const Booking = mongoose.model<IBooking>('Booking', bookingSchema)
-
+const Booking = mongoose.model<IBooking>("Booking", bookingSchema);
 
 export default Booking;
-
-
-
-// const BookingSchema = new mongoose.Schema({
-// 
-//
-//   ],
-//   price: Number,
-//   standard: String, 
-//   bookingStatus: {
-//     type: String,
-//     enum: ['pending', 'confirmed'],
-//   },
-//   createdAt: { type: Date, default: Date.now },
-// });
-
