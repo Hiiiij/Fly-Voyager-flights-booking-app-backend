@@ -6,10 +6,9 @@ const router = Router();
 router.get("/", validator, flightController.getFlights);
 router.post('/', validator, flightController.createFlight);
 
+router.get("/search", validator, flightController.searchFlights);
+router.get("/by-week", validator, flightController.getFlightsByWeek);
+router.get("/sort-by-price", validator, flightController.getFlightsSortedByPrice);
+router.get("/sort-by-duration", validator, flightController.getFlightsSortedByDuration);
+
 export default router;
-
-
-
-// router.get('/:id', flightController.getByID);
-// router.patch('/:id', validator, flightController.updateById);
-// router.delete('/:id', flightController.remove);

@@ -4,7 +4,7 @@ Search Flights: Show results from external APIs (like Amadeus or airline APIs).
 Mock Booking: When the user selects a flight to book, simulate the booking process by letting the user provide their passenger details. These details, along with the selected flight info, would be stored in MongoDB.
 instead of completing the booking :
 
-Send Data to Airline API: If you want to complete the booking, you'd send the user’s booking request (including flight and passenger info) to the airline’s API, if it supports it. Airlines or GDS systems may allow this through their APIs. Display Payment Option with Redirect: You could ask for customer information and then redirect to the airline’s website or payment platform to finalize the transaction. This would give the user the illusion that they are booking on your platform, but the actual booking happens on the airline's side.
+Send Data to Airline API: If you want to complete the booking, send the user’s booking request (including flight and passenger info) to the airline’s API, if it supports it. Airlines or GDS systems may allow this through their APIs. Display Payment Option with Redirect: Optionally could ask for customer information and then redirect to the airline’s website or payment platform to finalize the transaction. This would give the user the illusion that they are booking on your platform, but the actual booking happens on the airline's side.
 
 Advantages: You can store user data for future analytics or loyalty programs (e.g., saved bookings, frequent flyers). You maintain a more seamless user experience by simulating a booking process.
 
@@ -49,11 +49,3 @@ Data Duplication: While it may seem counterintuitive, sometimes duplicating cert
 
 Versioning: Implement versioning for APIs so that changes in one service can be made without breaking others.
 
-//Approach 1
-
-1. real-time //basic + skllis 
-
-2. use cron job  to get data from aviation api and save in flightModel db 
-to fetch data //logic  
-
-3. seed db with data manually use faker ==> 3models 

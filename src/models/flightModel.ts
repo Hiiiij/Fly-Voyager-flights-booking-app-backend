@@ -1,6 +1,7 @@
-import { ref } from "joi";
+
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
-interface IFlight extends Document {
+export interface IFlight extends Document {
+  _id: mongoose.Types.ObjectId;
   date?: Date;
   status: string;
   iata: string;

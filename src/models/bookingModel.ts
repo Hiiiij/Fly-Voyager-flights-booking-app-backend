@@ -35,3 +35,10 @@ const bookingSchema = new Schema({
 const Booking = mongoose.model<IBooking>("Booking", bookingSchema);
 
 export default Booking;
+
+
+//  trip_type: {
+//     type: String,
+//     enum: ["one_way", "round_trip"],
+//     default: "one_way",
+//   },

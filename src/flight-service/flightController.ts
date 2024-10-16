@@ -1,113 +1,128 @@
-import Flight from "../models/flightModel.js";
-import { Request, Response } from "express";
+import Flight, { type IFlight } from '../models/flightModel.js'; // Use 'type' keyword for TypeScript to recognize it as a type
+import { Request, Response } from 'express';
+import { queryParser, paginationHelper } from '../utilis/apiHelpers.js';
+import mongoose from 'mongoose';
 
-const getFlights = async (req: Request, res: Response) => {
-  try {
-    const { origin, destination, minPrice, maxPrice, sort, cursor } = req.query;
-    const limit = Number(req.query.limit) || 10;
+const flightController = {
+    getFlights: async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+        try {
+            const { origin, destination, minPrice, maxPrice, cursor } = req.query;
+            const limit = Number(req.query.limit) || 10;
 
-    const query: any = {};
-    if (origin) query["departure.iata"] = origin; // Filter by departure airport
-    if (destination) query["arrival.iata"] = destination; // Filter by arrival airport
-    if (minPrice) query.price = { ...query.price, $gte: Number(minPrice) }; 
-    if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) }; // Max price filter
+            const query: any = {};
+            if (origin) query["departure.iata"] = origin;
+            if (destination) query["arrival.iata"] = destination;
+            if (minPrice) query.price = { ...query.price, $gte: Number(minPrice) };
+            if (maxPrice) query.price = { ...query.price, $lte: Number(maxPrice) };
 
-    if (cursor) {
-      // Use the cursor _id for pagination instead of skip
-      query._id = { $gt: cursor };
-    }
+            // Handle cursor-based pagination
+            if (cursor) {
+                const cursorStr = cursor as string; // Ensure cursor is a string
+                if (mongoose.Types.ObjectId.isValid(cursorStr)) {
+                    query._id = { $gt: new mongoose.Types.ObjectId(cursorStr) }; // Use ObjectId for pagination
+                } else {
+                    return res.status(400).json({ error: 'Invalid cursor value' });
+                }
+            }
 
-    // Fetch flights based on the cursor//logic for connecting real-time api
-    const flights = await Flight.find(query)
-      .sort({ _id: 1 }) // Ensure consistent ordering by _id
-      .limit(limit);
+            const flights = await Flight.find(query).limit(limit);
+            const lastFlight = flights[flights.length - 1];
 
-    const lastFlight = flights[flights.length - 1];
+            return res.status(200).json({
+                flights,
+                nextCursor: lastFlight ? lastFlight._id.toString() : null,
+            });
+        } catch (error) {
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    },
 
-    // Return flights and the next cursor (which is the last flight's _id)
-    return res.status(200).json({
-      flights,
-      nextCursor: lastFlight ? lastFlight._id : null,
-    });
-  } catch (error) {
-    const err = error as Error;
-    return res.status(500).json({
-      message: err.message
-    });
-  }
+    createFlight: async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+        try {
+            const newFlight = new Flight(req.body);
+            await newFlight.save();
+            return res.status(201).json(newFlight);
+        } catch (error) {
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+
+    searchFlights: async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+        try {
+            const { limit, cursor } = paginationHelper(req.query);
+            const filter = queryParser(req.query, ['departure', 'arrival', 'date']);
+            
+            let query = Flight.find(filter);
+
+            // Handle cursor-based pagination
+            if (cursor) {
+                const cursorStr = cursor as string; // Ensure cursor is a string
+                if (mongoose.Types.ObjectId.isValid(cursorStr)) {
+                    const cursorObjectId = new mongoose.Types.ObjectId(cursorStr);
+                    query = query.where('_id').nin([cursorObjectId]); // Exclude documents after the cursor
+                } else {
+                    return res.status(400).json({ error: 'Invalid cursor value' });
+                }
+            }
+
+            const flights = await query.limit(limit + 1).sort({ _id: 1 });
+
+            // Determine if there are more results
+            const hasMore = flights.length > limit;
+            const results: IFlight[] = flights.slice(0, limit); 
+            const nextCursor = hasMore ? results[results.length - 1]._id.toString() : null; // Convert ObjectId to string for cursor
+
+            return res.json({
+                flights: results,
+                nextCursor,
+                hasMore,
+            });
+        } catch (error) {
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+
+    getFlightsByWeek: async (req: Request, res: Response): Promise<Response<any, Record<string, any>>> => {
+        try {
+            const { startDate } = req.query;
+
+            if (!startDate || typeof startDate !== 'string') {
+                return res.status(400).json({ error: 'Invalid startDate parameter' });
+            }
+
+            const start = new Date(startDate);
+            const end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+            const flights = await Flight.find({
+                date: { $gte: start, $lt: end },
+            });
+
+            return res.json(flights);
+        } catch (error) {
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+
+    getFlightsSortedByPrice: async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { order } = req.query;
+            const sortOrder = order === 'desc' ? -1 : 1;
+
+            const flights = await Flight.find().sort({ price: sortOrder });
+            res.json(flights);
+        } catch (error) {
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+
+    getFlightsSortedByDuration: async (req: Request, res: Response): Promise<void> => {
+        try {
+            const flights = await Flight.find().sort({ duration: 1 });
+            res.json(flights);
+        } catch (error) {
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
 };
 
-const createFlight = async (req: Request, res: Response) => {
-  try {
-    const {
-      flight_date,
-      return_date,
-      flight_status,
-      departure,
-      arrival,
-      airline,
-      flight,
-      price,
-      duration,
-      trip_type,
-      class: flightClass,
-    } = req.body;
-
-    const missingFields = [];
-    if (!departure || !departure.iata || !departure.airport) missingFields.push("departure");
-    if (!arrival || !arrival.iata || !arrival.airport) missingFields.push("arrival");
-    if (!airline || !airline.name || !airline.iata) missingFields.push("airline");
-    if (!flight || !flight.iata) missingFields.push("flight");
-    if (price === undefined) missingFields.push("price");
-    if (duration === undefined) missingFields.push("duration");
-    if (!trip_type) missingFields.push("trip_type");
-    if (!flightClass) missingFields.push("class");
-
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        error: `${missingFields.join(", ")} ${missingFields.length > 1 ? "are" : "is"} required`,
-      });
-    }
-
-    const newFlight = {
-      flight_date: flight_date || new Date(),
-      return_date: return_date || null,
-      flight_status: flight_status || 'scheduled',
-      departure: {
-        airport: departure.airport,
-        iata: departure.iata,
-      },
-      arrival: {
-        airport: arrival.airport,
-        iata: arrival.iata,
-      },
-      airline: {
-        name: airline.name,
-        iata: airline.iata,
-      },
-      flight: {
-        number: flight.number, // Ensure you include the flight number if it's in the schema
-        iata: flight.iata,
-      },
-      price,
-      duration,
-      trip_type: trip_type || 'one_way',
-      class: flightClass || 'Economy',
-    };
-
-    // Save to the db
-    const flightDocument = await Flight.create(newFlight);
-
-    return res.status(201).json({
-      message: "Flight created successfully",
-      flight: flightDocument,
-    });
-  } catch (error) {
-    const err = error as Error;
-    return res.status(500).json({
-      message: err.message || "An error occurred while creating the flight",
-    });
-  }
-};
-
-export default { createFlight, getFlights };
+export default flightController;
