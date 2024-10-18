@@ -1,4 +1,3 @@
-
 import mongoose, { Schema, Document, ObjectId } from "mongoose";
 export interface IFlight extends Document {
   _id: mongoose.Types.ObjectId;
@@ -27,7 +26,7 @@ interface IAirport extends Document {
   iata: string;
 }
 
-const flightSchema = new Schema({
+export const flightSchema = new Schema({
   date: { type: Date, default: Date.now },
   status: { type: String, default: "scheduled" },
   iata: { type: String, required: true },
@@ -47,13 +46,12 @@ const flightSchema = new Schema({
   duration: { type: Number, required: true },
 });
 
-const airportSchema = new Schema({
+export const airportSchema = new Schema({
   name: { type: String, required: true },
   iata: { type: String, required: true, unique: true },
+  // destination: [name, iata]
 });
 
-const Airport = mongoose.model<IAirport>("Airport", airportSchema);
+export const Airport = mongoose.model<IAirport>("Airport", airportSchema);
 
-const Flight = mongoose.model<IFlight>("Flight", flightSchema);
-
-export default Flight;
+export const Flight = mongoose.model<IFlight>("Flight", flightSchema);

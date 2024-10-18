@@ -3,7 +3,7 @@ import router from "./bookingRoutes.js"
 import dotenv from 'dotenv';
 import mongoose from "mongoose";
 import {userSchema} from '../models/userModel.js';
-import {flightSchema} from '../models/flightModel.js';
+// import {flightSchema} from '../models/flightModel.js';
 
 dotenv.config();
 
@@ -17,7 +17,7 @@ const connectDB = async () => {
         if(databaseURI) {    
             await mongoose.connect(databaseURI);
             mongoose.model('User', userSchema);
-            mongoose.model('Flight', flightSchema);
+            // mongoose.model('Flight', flightSchema);
         } else {
             console.log("Database URI missing from enviromental variables");
         }
