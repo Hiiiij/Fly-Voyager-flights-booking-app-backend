@@ -6,9 +6,9 @@ Fly-Voyager is a microservices-based backend for a flight booking application. T
 
 ---
 
-## Project Structure
+```## Project Structure
 
-```
+
 /flight-booking-system
 │
 ├── /src
