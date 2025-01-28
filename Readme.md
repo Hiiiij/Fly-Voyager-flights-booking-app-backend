@@ -12,7 +12,6 @@ Fly-Voyager is a microservices-based backend for a flight booking application. T
 /flight-booking-system
 │
 ├── /src
-│   │
 │   ├── /flight-service
 │   │   ├── flightController.ts     # Business logic for flights
 │   │   ├── flightRoutes.ts         # Routing for flight-related APIs
@@ -25,11 +24,11 @@ Fly-Voyager is a microservices-based backend for a flight booking application. T
 │   │   ├── middlewares.ts          # Middleware for user service
 │   │   ├── index.ts                # User service entry point
 │   │
-│   └── /booking-service
-│       ├── bookingController.ts    # Business logic for bookings
-│       ├── bookingRoutes.ts        # Routing for booking-related APIs
-│       ├── middleware.ts           # Middleware for booking service
-│       ├── index.ts                # Booking service entry point
+│   ├── /booking-service
+│   │   ├── bookingController.ts    # Business logic for bookings
+│   │   ├── bookingRoutes.ts        # Routing for booking-related APIs
+│   │   ├── middleware.ts           # Middleware for booking service
+│   │   ├── index.ts                # Booking service entry point
 │
 ├── /models
 │   ├── bookingModel.ts             # Schema for bookings in MongoDB
@@ -40,6 +39,7 @@ Fly-Voyager is a microservices-based backend for a flight booking application. T
 ├── package.json                    # Dependencies and scripts
 ├── tsconfig.json                   # TypeScript configuration
 └── vercel.json                     # Vercel deployment configuration
+
 ```
 
 ---
